@@ -71,16 +71,69 @@ public class AccesoBD {
 			}
 
 			consulta.executeUpdate();
-			sc.close();
 			con.close();
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 		}
 	}
 
-	public static void eliminarEquipoMySQL() {
+	public static void eliminarEquipoMySQL(String codEquipo) {
+		Scanner sc = new Scanner(System.in);
 		try {
 			Connection con = DriverManager.getConnection(url, user, pass);
+
+			String sqlEquipo = "SELECT * FROM equipos WHERE codEquipo = " + codEquipo;
+			PreparedStatement consultaEquipo = con.prepareStatement(sqlEquipo);
+			ResultSet resultadoEquipo = consultaEquipo.executeQuery();
+
+			String sqlContratos = "SELECT * FROM contratos WHERE codEquipo = " + codEquipo;
+			PreparedStatement consultaContratos = con.prepareStatement(sqlContratos);
+			ResultSet resultadoContratos = consultaContratos.executeQuery();
+
+			boolean borrado = false;
+			if (resultadoEquipo.next()) {
+				if (resultadoContratos.isBeforeFirst() == false) {
+					System.out.println("¿Seguro que quiere borrar este equipo? (si o no)");
+					String eleccion = sc.nextLine();
+
+					if (eleccion.toLowerCase().equals("si")) {
+						borrado = true;
+					}
+				} else {
+					System.out.println("Si quiere borrar este equipo, debe borrar estos contratos: \n");
+					
+					while (resultadoContratos.next()) {
+
+						String codContrato = resultadoContratos.getString("codcontrato");
+						String coddnionie = resultadoContratos.getString("coddnionie");
+						String fechaInicio = resultadoContratos.getString("fechaInicio");
+						String fechaFin = resultadoContratos.getString("fechaFin");
+						String precioanual = resultadoContratos.getString("precioanual");
+						String preciorecision = resultadoContratos.getString("preciorecision");
+
+						System.out.println(" - " + codContrato + " | " + coddnionie + " | " + fechaInicio + " | "
+								+ fechaFin + " | " + precioanual + " | " + preciorecision);
+					}
+					System.out.println("");
+					System.out.println("¿Seguro que quiere borrar este equipo y estos contratos? (si o no)");
+					String eleccion = sc.nextLine();
+
+					if (eleccion.toLowerCase().equals("si")) {
+						borrado = true;
+					}
+				}
+
+			}
+
+			if (borrado == true) {
+				String sqlBorradoContratos = "DELETE FROM contratos WHERE codEquipo = " + codEquipo;
+				PreparedStatement borradoContratos = con.prepareStatement(sqlBorradoContratos);
+				borradoContratos.executeUpdate();
+
+				String sqlBorradoEquipo = "DELETE FROM equipos WHERE codEquipo = " + codEquipo;
+				PreparedStatement borradoEquipo = con.prepareStatement(sqlBorradoEquipo);
+				borradoEquipo.executeUpdate();
+			}
 
 			con.close();
 		} catch (Exception ex) {
@@ -116,7 +169,6 @@ public class AccesoBD {
 			consulta.setBoolean(4, internacional);
 
 			consulta.executeUpdate();
-			sc.close();
 			con.close();
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
@@ -156,7 +208,6 @@ public class AccesoBD {
 			System.out.println("La liga insertada existe: " + consulta.getString(5) + " | Estado de inserción: "
 					+ consulta.getString(6) + " \n");
 
-			sc.close();
 			con.close();
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
