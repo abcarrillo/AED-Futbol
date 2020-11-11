@@ -100,7 +100,9 @@ public class App {
 		System.out.println("");
 		System.out.println("¿Que base de datos?");
 		System.out.println("1: MySQL");
-		System.out.println("2: Access");
+		if(!operacion.contains("procedimiento")) {
+			System.out.println("2: Access");	
+		}
 		System.out.println("3: SQLServer");
 		System.out.println("4: Cancelar operación");
 		String eleccion = sc.nextLine();
@@ -150,7 +152,32 @@ public class App {
 			break;
 		}
 		case "2": {
-
+			switch (operacion) {
+			case "listado": {
+				AccesoBD.listarEquiposAccess();
+				break;
+			}
+			case "insercion": {
+				AccesoBD.insertarEquipoAccess();
+				break;
+			}
+			case "borrado": {
+				AccesoBD.listarEquiposAccess();
+				System.out.println("¿Qué equipo quieres borrar? (0 para cancelar)");
+				String cod = sc.nextLine();
+				AccesoBD.eliminarEquipoAccess(cod);;
+				break;
+			}
+			case "modificacion": {
+				AccesoBD.listarEquiposAccess();
+				System.out.println("¿Qué equipo quieres modificar? \n");
+				String cod = sc.nextLine();
+				AccesoBD.modificarEquipoAccess(cod);
+				break;
+			}
+			default:
+				break;
+			}
 			break;
 		}
 		case "3": {
